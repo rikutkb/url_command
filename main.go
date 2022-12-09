@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
-	"net/http/httputil"
 	"os"
 )
 
@@ -54,20 +53,16 @@ func main() {
 	// TODO APIキーが設定できていない場合はエラーとして出力するようにする。
 	// TODO interfaceとしてhttp通信部分を実装
 	url := url_flag
-	fmt.Print(url)
 	body_json, _ := json.Marshal(BitlyBody{Domain: "bit.ly", URL: url})
 	BITLY_API_KEY := os.Getenv("BIT_API_KEY")
 	method := "POST"
 	serviceUrl := "https://api-ssl.bitly.com/v4/shorten"
-	fmt.Print(url)
 	body := bytes.NewBuffer(body_json)
 	req, err := http.NewRequest(method, serviceUrl, body)
 	if err != nil {
 		fmt.Errorf("%s", err)
 	}
-	req.Header.Set("Authorization", "bearer"+BITLY_API_KEY)
-	dump, _ := httputil.DumpRequest(req, true)
-	fmt.Print(string(dump))
+	req.Header.Set("Authorization", "Bearer "+BITLY_API_KEY)
 	client := new(http.Client)
 	resp, err := client.Do(req)
 	if err != nil {
@@ -77,13 +72,11 @@ func main() {
 	defer resp.Body.Close()
 	respBody, _ := ioutil.ReadAll(resp.Body)
 	var bitlyRespBody = BitlyRespBody{}
-	fmt.Print(string(respBody))
 	if err := json.Unmarshal(respBody, &bitlyRespBody); err != nil {
 		fmt.Errorf("error:%s", err)
 		os.Exit(2)
 
 	}
-	fmt.Print(bitlyRespBody)
-	fmt.Print(bitlyRespBody.ShortURL)
+	fmt.Println(bitlyRespBody.ShortURL)
 
 }
