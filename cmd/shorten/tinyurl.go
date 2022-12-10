@@ -25,7 +25,7 @@ type TinyURLRespData struct {
 type TinyURLResp struct {
 	TinyURLRespData `json:"data"`
 }
-type TinyURLErrResp struct {
+type TinyURLRespFail struct {
 	Errors []string `json:"errors"`
 }
 
@@ -56,19 +56,19 @@ func (t *TinyURL) CreateReq(baseUrl string) (req *http.Request, err error) {
 	return req, err
 }
 func (t *TinyURL) ParseResp(resp *http.Response) (shUrl string, err error) {
-	respBody, _ := ioutil.ReadAll(resp.Body)
-	if resp.StatusCode == 200 {
+	bodyText, _ := ioutil.ReadAll(resp.Body)
+	if resp.StatusCode == http.StatusOK {
 		var tinyURLResp = TinyURLResp{}
-		if err := json.Unmarshal(respBody, &tinyURLResp); err != nil {
+		if err := json.Unmarshal(bodyText, &resp); err != nil {
 			return "", err
 		}
 		return tinyURLResp.Url, nil
 	} else {
-		var TinyURLErrResp = TinyURLErrResp{}
-		if err := json.Unmarshal(respBody, &TinyURLErrResp); err != nil {
+		var resp = TinyURLRespFail{}
+		if err := json.Unmarshal(bodyText, &resp); err != nil {
 			return "", err
 		}
-		return "", err
+		return "", errors.New(resp.Errors[0])
 	}
 
 }

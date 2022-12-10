@@ -17,6 +17,17 @@ type BitlyResp struct {
 	CreatedAt string `json:"created_at"`
 	ShortURL  string `json:"link"`
 }
+type BitlyRespErrors struct {
+	Field     string `json:"field"`
+	ErrorCode string `json:"error_code"`
+	Message   string `json:"message"`
+}
+type BitlyRespFail struct {
+	Message     string            `json:"message"`
+	Description string            `json:"description"`
+	Resource    string            `json:"resource"`
+	Errors      []BitlyRespErrors `json:"errors"`
+}
 
 type Bitly struct {
 	apiKey string
@@ -49,14 +60,18 @@ func (b *Bitly) CreateReq(baseUrl string) (req *http.Request, err error) {
 }
 func (b *Bitly) ParseResp(resp *http.Response) (shUrl string, err error) {
 
-	respBody, _ := ioutil.ReadAll(resp.Body)
-	if resp.StatusCode == 200 {
-		var bitlyRespBody = BitlyResp{}
-		if err := json.Unmarshal(respBody, &bitlyRespBody); err != nil {
+	bodyText, _ := ioutil.ReadAll(resp.Body)
+	if resp.StatusCode == http.StatusOK {
+		resp := BitlyResp{}
+		if err := json.Unmarshal(bodyText, &resp); err != nil {
 			return "", err
 		}
-		return bitlyRespBody.ShortURL, nil
+		return resp.ShortURL, nil
 	} else {
-		return "", errors.New("err")
+		resp := BitlyRespFail{}
+		if err := json.Unmarshal(bodyText, &resp); err != nil {
+			return "", err
+		}
+		return "", errors.New(resp.Errors[0].Message)
 	}
 }
