@@ -14,16 +14,18 @@ url [-f] file
 url [-rep][--replace] file
 
 ### 使用するサービスの指定
-url [-s][--service] (bit|pixiv)
+url [-k][--kind] (bit|tinyurl)
 
 ### 元url取得
 url [-u][--undo] url
 
-### apiトークン設定
-url [-i]
-
-
 
 ### APIキーの登録
 bitlyの使用時
-export BIT_API_KEY=xxxxxxxxxxxxxxxxxxxxxxx
+
+export BIT_API_KEY=xxxxxxxxxxxxxxxxxxxxxxx 
+
+
+tinyURLの使用時
+
+export TINYURL_API_KEY=xxxxxxxxxxxxxxxxxxxxxxx 

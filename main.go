@@ -20,6 +20,9 @@ var (
 	set_flag     string
 	qr_flag      bool
 	file_flag    string
+	init_flag    string
+	kind_flag    string
+	token_flag   string
 )
 
 func FlagInit() {
@@ -32,6 +35,8 @@ func FlagInit() {
 	flag.StringVar(&service_flag, "service", "bitly", "urlの短縮を行います。")
 	flag.StringVar(&set_flag, "set", "", "")
 	flag.StringVar(&file_flag, "f", "", "")
+	flag.StringVar(&kind_flag, "k", "bitly", "使用サービスの指定を行います。")
+	flag.StringVar(&token_flag, "t", "", "APIトークンの設定を行います。")
 }
 
 func main() {
@@ -42,16 +47,26 @@ func main() {
 		}
 		os.Exit(2)
 	}
-	// TODO APIキーが設定できていない場合はエラーとして出力するようにする。
-	// TODO interfaceとしてhttp通信部分を実装
-	url := url_flag
-	var fetcher = NewFecher("bitly")
-	shortUrl, err := CreateShorUrl(url, fetcher)
-	if err != nil {
-		fmt.Errorf("%v", err)
+	// 短縮orQRコード,短縮urlを元に戻す
+	if url_flag != "" {
+		// TODO APIキーが設定できていない場合はエラーとして出力するようにする。
+		// TODO interfaceとしてhttp通信部分を実装
+		url := url_flag
+		var fetcher = NewFecher(kind_flag)
+		if err := fetcher.Init(); err != nil {
+			fmt.Printf("%v", err)
+			os.Exit(2)
+		}
+		shortUrl, err := CreateShorUrl(url, fetcher)
+		if err != nil {
+			fmt.Printf("%v", err)
+			os.Exit(2)
+		}
+		fmt.Println(shortUrl)
+	} else {
+		fmt.Errorf("不正なコマンド入力です。")
 		os.Exit(2)
 	}
-	fmt.Println(shortUrl)
 
 }
 
@@ -71,8 +86,6 @@ func CreateShorUrl(url string, fetcher IFetchShUrl) (shortUrl string, err error)
 }
 
 type IFetchShUrl interface {
-	// 受け取ったAPIキーを環境変数としてセット
-	SetApiKey(apiKey string) (err error)
 	// 環境変数からAPIキーをセット
 	Init() (err error)
 	ParseResp(resp *http.Response) (shUrl string, err error)
@@ -98,14 +111,16 @@ type TinyURLErrResp struct {
 	Errors []string `json:"errors"`
 }
 
-// 受け取ったAPIキーを環境変数としてセット
-func (t *TinyURL) SetApiKey(apiKey string) (err error) {
-	panic("not implemented") // TODO: Implement
-}
+const TINYURL_API_ENV = "TINYURL_API_KEY"
 
 // 環境変数からAPIキーをセット
 func (t *TinyURL) Init() (err error) {
-	panic("not implemented") // TODO: Implement
+	apiKey := os.Getenv(TINYURL_API_ENV)
+	if apiKey == "" {
+		return errors.New("APIキーがセットされていません。")
+	}
+	t.apiKey = apiKey
+	return nil
 }
 
 func (t *TinyURL) CreateReq(baseUrl string) (req *http.Request, err error) {
@@ -166,16 +181,10 @@ func NewFecher(service string) IFetchShUrl {
 
 }
 
-func (b *Bitly) SetApiKey(apiKey string) (err error) {
-	if apiKey == "" {
-		return errors.New("APIキーがセットされていません。")
-	}
-	b.apiKey = apiKey
-	return nil
+const BITLY_API_ENV = "BIT_API_KEY"
 
-}
 func (b *Bitly) Init() (err error) {
-	apiKey := os.Getenv("BIT_API_KEY")
+	apiKey := os.Getenv(BITLY_API_ENV)
 	if apiKey == "" {
 		return errors.New("APIキーがセットされていません。")
 	}
