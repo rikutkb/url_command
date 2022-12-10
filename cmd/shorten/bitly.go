@@ -35,6 +35,10 @@ type Bitly struct {
 
 const BITLY_API_ENV = "BIT_API_KEY"
 
+func (b Bitly) GetApiKey() string {
+	return b.apiKey
+}
+
 func (b *Bitly) Init() (err error) {
 	apiKey := os.Getenv(BITLY_API_ENV)
 	if apiKey == "" {
