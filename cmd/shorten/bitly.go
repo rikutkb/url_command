@@ -60,6 +60,7 @@ func (b *Bitly) CreateReq(baseUrl string) (req *http.Request, err error) {
 		return nil, err
 	}
 	req.Header.Set("Authorization", "Bearer "+BITLY_API_KEY)
+
 	return req, err
 }
 func (b *Bitly) ParseResp(resp *http.Response) (shUrl string, err error) {

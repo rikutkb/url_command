@@ -12,6 +12,8 @@ func CreateShortUrl(url string, fetcher IFetchShUrl) (shortUrl string, err error
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 	request, err := fetcher.CreateReq(url)
+	request.Header.Set("accept", "application/json")
+	request.Header.Set("Content-Type", "application/json")
 	if err != nil {
 		return "", fmt.Errorf("リクエストの作成に失敗しました。:%s", err)
 	}

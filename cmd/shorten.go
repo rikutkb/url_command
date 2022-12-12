@@ -16,7 +16,7 @@ var service string
 var url string
 var shortenCmd = &cobra.Command{
 	Use:   "shorten",
-	Short: "",
+	Short: "APIを使用しurlの短縮化を行います。",
 	Long:  "",
 	Run: func(cmd *cobra.Command, args []string) {
 		var fetcher = shorten.NewFecher(service)
