@@ -52,12 +52,13 @@ func main() {
 
 		var fetcher = shorten.NewFecher(kind_flag)
 		if err := fetcher.Init(); err != nil {
-			fmt.Printf("%v", err)
+			fmt.Fprintln(os.Stderr, err)
 			os.Exit(2)
 		}
 		shortUrl, err := shorten.CreateShortUrl(url, fetcher)
 		if err != nil {
-			fmt.Printf("%v", err)
+
+			fmt.Fprintln(os.Stderr, err)
 			os.Exit(2)
 		}
 		fmt.Println(shortUrl)

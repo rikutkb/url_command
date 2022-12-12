@@ -1,16 +1,25 @@
 package shorten
 
-import "net/http"
+import (
+	"context"
+	"fmt"
+	"net/http"
+	"time"
+)
 
 func CreateShortUrl(url string, fetcher IFetchShUrl) (shortUrl string, err error) {
+	// 10秒でタイムアウトを行う。
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
 	request, err := fetcher.CreateReq(url)
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("リクエストの作成に失敗しました。:%s", err)
 	}
 	client := new(http.Client)
-	resp, err := client.Do(request)
+	resp, err := client.Do(request.WithContext(ctx))
 	if err != nil {
-		return "", err
+		// レスポンスヘッダー取得に10秒以上かかった場合
+		return "", fmt.Errorf("ヘッダーの取得に失敗しました。:%s", err)
 	}
 	defer resp.Body.Close()
 	return fetcher.ParseResp(resp)
