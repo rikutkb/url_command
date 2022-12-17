@@ -25,7 +25,6 @@ func GetRedirect(url string) (longUrl string, err error) {
 	if err != nil {
 		return "", err
 	}
-	//We Read the response body on the line below.
 	body, err := ioutil.ReadAll(resp.Body)
 	defer resp.Body.Close()
 	if err != nil {

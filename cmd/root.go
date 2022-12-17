@@ -27,6 +27,9 @@ import (
 	"github.com/spf13/cobra"
 )
 
+var service string
+var urls string
+
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:   "url_command.git",
