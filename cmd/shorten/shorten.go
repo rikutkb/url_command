@@ -7,9 +7,9 @@ import (
 	"time"
 )
 
-func CreateShortUrl(url string, fetcher IFetchShUrl) (shortUrl string, err error) {
+func CreateShortUrl(ctx context.Context, url string, fetcher IFetchShUrl) (shortUrl string, err error) {
 	// 10秒でタイムアウトを行う。
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	ctx, cancel := context.WithTimeout(ctx, 10*time.Second)
 	defer cancel()
 	request, err := fetcher.CreateReq(url)
 	request.Header.Set("accept", "application/json")

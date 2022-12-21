@@ -39,6 +39,7 @@ func (t *TinyURL) Init() (err error) {
 	return nil
 }
 
+// Requstの認証方法はそれぞれ異なる可能性があるため、生成メソッドは別にする
 func (t *TinyURL) CreateReq(baseUrl string) (req *http.Request, err error) {
 	body_json, _ := json.Marshal(TinyURLReq{URL: baseUrl})
 	API_KEY := t.apiKey

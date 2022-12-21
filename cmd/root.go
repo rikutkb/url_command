@@ -22,13 +22,56 @@ THE SOFTWARE.
 package cmd
 
 import (
+	"context"
+	"fmt"
+	"log"
 	"os"
+	"os/signal"
+	"syscall"
 
 	"github.com/spf13/cobra"
 )
 
+const (
+	ExitCodeOK        int = iota //0
+	ExitCodeError                //1
+	ExitCodeFileError            //2
+)
+
 var service string
 var urls string
+var ctx context.Context
+var cancel context.CancelFunc
+
+// os signalインターフェースを実装
+type CancelSig struct {
+	message string
+}
+
+func (s CancelSig) Signal() {}
+func (s CancelSig) String() string {
+	return s.message
+}
+
+var _ os.Signal = CancelSig{}
+var sigCh chan os.Signal
+
+func SetCancelSignal(message string) {
+	sigCh <- CancelSig{message: message}
+}
+
+func cancelBySignal(cancel context.CancelFunc) {
+	sig := <-sigCh
+	switch s := sig.(type) {
+	case syscall.Signal:
+		log.Printf("[info] canceled by got signal %d", s)
+	case CancelSig:
+		// Stringが評価される。
+		log.Printf("[info] canceled by %s", s)
+	}
+	fmt.Fprintln(os.Stdout, "cancel by signal")
+	cancel()
+}
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
@@ -64,4 +107,10 @@ func init() {
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.
 	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	sigCh = make(chan os.Signal, 1)
+	signal.Notify(sigCh, syscall.SIGHUP)
+	ctx, cancel = context.WithCancel(context.Background())
+	go func() {
+		cancelBySignal(cancel)
+	}()
 }
