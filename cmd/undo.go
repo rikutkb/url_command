@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"os"
 	"strings"
@@ -19,21 +18,20 @@ func fetchUrls(ctx context.Context, reqUrls []string) (error, map[string]string)
 	var urlPairs = make(map[string]string)
 
 	for _, url := range reqUrls {
-		select {
-		case <-ctx.Done():
-			return errors.New("fetch is canceled."), nil
-		default:
-		}
+
 		sem <- true
 		func(_url string) {
 			eg.Go(func() error {
+				select {
+				case <-ctx.Done():
+					return fmt.Errorf("キャンセルされました: %s", ctx.Err())
+				default:
+				}
 				defer func() {
 					<-sem
 				}()
 				longUrl, err := undo.GetRedirect(ctx, _url)
 				if err != nil {
-					SetCancelSignal(err.Error())
-					fmt.Fprintln(os.Stderr, err)
 					return err
 				}
 				urlPairs[_url] = longUrl
@@ -43,7 +41,7 @@ func fetchUrls(ctx context.Context, reqUrls []string) (error, map[string]string)
 
 	}
 	if err := eg.Wait(); err != nil {
-		fmt.Fprintln(os.Stderr, err)
+		SetCancelSignal(err.Error())
 		return err, nil
 	}
 	return nil, urlPairs
@@ -56,6 +54,7 @@ var undoCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		splitedUrl := strings.Split(urls, ",")
 		if err, pairUrls := fetchUrls(ctx, splitedUrl); err != nil {
+			fmt.Fprintln(os.Stderr, err)
 			os.Exit(2)
 		} else {
 			for baseUrl, resultUrl := range pairUrls {

@@ -17,7 +17,7 @@ import (
 
 func shortenUrls(ctx context.Context, reqUrls []string, fetcher shorten.IFetchShUrl) error {
 	var wg sync.WaitGroup
-	sem := make(chan bool, 1)
+	sem := make(chan bool, 3)
 	defer close(sem)
 
 	for _, url := range reqUrls {
