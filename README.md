@@ -28,4 +28,11 @@ export BIT_API_KEY=xxxxxxxxxxxxxxxxxxxxxxx
 
 tinyURLの使用時
 
-export TINYURL_API_KEY=xxxxxxxxxxxxxxxxxxxxxxx 
+$ export TINYURL_API_KEY=xxxxxxxxxxxxxxxxxxxxxxx 
+$ ./main shorten -s bitly -u https://github.com/rikutkb/url_command                  
+APIキーがセットされていません。
+$ ./main shorten -s TinyURL -u https://github.com/rikutkb/url_command                
+baseUrl:https://github.com/rikutkb/url_command, resultUrl:https://tinyurl.com/2kvjk6jm
+
+$ ./main undo -u https://tinyurl.com/2kvjk6jm
+baseUrl:https://tinyurl.com/2kvjk6jm,resultUrl: https://github.com/rikutkb/url_command

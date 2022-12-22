@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"os"
@@ -57,11 +58,11 @@ func (b *Bitly) CreateReq(baseUrl string) (req *http.Request, err error) {
 	body := bytes.NewBuffer(body_json)
 	req, err = http.NewRequest(method, serviceUrl, body)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to create request : %s", err)
 	}
 	req.Header.Set("Authorization", "Bearer "+BITLY_API_KEY)
 
-	return req, err
+	return req, nil
 }
 func (b *Bitly) ParseResp(resp *http.Response) (shUrl string, err error) {
 
@@ -69,13 +70,13 @@ func (b *Bitly) ParseResp(resp *http.Response) (shUrl string, err error) {
 	if resp.StatusCode == http.StatusOK {
 		resp := BitlyResp{}
 		if err := json.Unmarshal(bodyText, &resp); err != nil {
-			return "", err
+			return "", fmt.Errorf("failed to unmarshal json : %s", err)
 		}
 		return resp.ShortURL, nil
 	} else {
 		resp := BitlyRespFail{}
 		if err := json.Unmarshal(bodyText, &resp); err != nil {
-			return "", err
+			return "", fmt.Errorf("failed to marshal json : %s", err)
 		}
 		return "", errors.New(resp.Errors[0].Message)
 	}

@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
-	"net/http/httputil"
 	"os"
 )
 
@@ -48,34 +47,25 @@ func (t *TinyURL) CreateReq(baseUrl string) (req *http.Request, err error) {
 	method := "POST"
 	body := bytes.NewBuffer(body_json)
 	req, err = http.NewRequest(method, serviceUrl, body)
-	b, err := httputil.DumpRequest(req, true)
 	if err != nil {
-		fmt.Println(err)
-	} else {
-		fmt.Println(string(b))
-	}
-	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to create request : %s", err)
 	}
 	req.Header.Set("Authorization", "Bearer "+API_KEY)
 
-	return req, err
+	return req, nil
 }
 func (t *TinyURL) ParseResp(resp *http.Response) (shUrl string, err error) {
 	bodyText, _ := ioutil.ReadAll(resp.Body)
 	if resp.StatusCode == http.StatusOK {
 		var resp = TinyURLResp{}
 		if err := json.Unmarshal(bodyText, &resp); err != nil {
-			return "", err
+			return "", fmt.Errorf("failed to unmarshal json :%s", err)
 		}
 		return resp.TinyURLRespData.Url, nil
 	} else {
 		var resp = TinyURLRespFail{}
 		if err := json.Unmarshal(bodyText, &resp); err != nil {
-			return "", err
-		}
-		for e := range resp.Errors {
-			fmt.Print(e)
+			return "", fmt.Errorf("failed to unmarshal json :%s", err)
 		}
 
 		return "", fmt.Errorf("通信中に不具合がありました。:%s", resp.Errors)

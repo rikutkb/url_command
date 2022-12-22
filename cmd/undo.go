@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"os"
 	"strings"
@@ -11,18 +12,18 @@ import (
 	"golang.org/x/sync/errgroup"
 )
 
-func fetchUrls(ctx context.Context, reqUrls []string) {
-	sem := make(chan bool, 2)
+func fetchUrls(ctx context.Context, reqUrls []string) (error, map[string]string) {
+	sem := make(chan bool, 3)
 	eg, ctx := errgroup.WithContext(ctx)
 	defer close(sem)
+	var urlPairs = make(map[string]string)
 
 	for _, url := range reqUrls {
 		select {
 		case <-ctx.Done():
-			return
+			return errors.New("fetch is canceled."), nil
 		default:
 		}
-
 		sem <- true
 		func(_url string) {
 			eg.Go(func() error {
@@ -35,7 +36,7 @@ func fetchUrls(ctx context.Context, reqUrls []string) {
 					fmt.Fprintln(os.Stderr, err)
 					return err
 				}
-				fmt.Fprintln(os.Stdout, "baseUrl:"+_url+", resultUrl:"+longUrl)
+				urlPairs[_url] = longUrl
 				return nil
 			})
 		}(url)
@@ -43,8 +44,9 @@ func fetchUrls(ctx context.Context, reqUrls []string) {
 	}
 	if err := eg.Wait(); err != nil {
 		fmt.Fprintln(os.Stderr, err)
-		return
+		return err, nil
 	}
+	return nil, urlPairs
 }
 
 var undoCmd = &cobra.Command{
@@ -53,8 +55,13 @@ var undoCmd = &cobra.Command{
 	Long:  "",
 	Run: func(cmd *cobra.Command, args []string) {
 		splitedUrl := strings.Split(urls, ",")
-
-		fetchUrls(ctx, splitedUrl)
+		if err, pairUrls := fetchUrls(ctx, splitedUrl); err != nil {
+			os.Exit(2)
+		} else {
+			for baseUrl, resultUrl := range pairUrls {
+				fmt.Fprintln(os.Stdout, "baseUrl:"+baseUrl+",resultUrl: "+resultUrl)
+			}
+		}
 	},
 }
 

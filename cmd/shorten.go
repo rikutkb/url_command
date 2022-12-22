@@ -52,13 +52,11 @@ var shortenCmd = &cobra.Command{
 	Long:  "",
 	Run: func(cmd *cobra.Command, args []string) {
 		var fetcher = shorten.NewFecher(service)
-
 		if err := fetcher.Init(); err != nil {
 			fmt.Fprintln(os.Stderr, err)
 			os.Exit(2)
 		}
 		splitedUrls := strings.Split(urls, ",")
-
 		err := shortenUrls(ctx, splitedUrls, fetcher)
 		if err != nil {
 
@@ -70,6 +68,8 @@ var shortenCmd = &cobra.Command{
 
 func init() {
 	shortenCmd.PersistentFlags().StringVarP(&urls, "url", "u", "", "短縮API")
+	shortenCmd.PersistentFlags().StringVarP(&service, "service", "s", "", "短縮API")
+
 	//shortenCmd.PersistentFlags().StringArrayVarP(&urls, "url", "u", make([]string, 0), "短縮API")
 	rootCmd.AddCommand(shortenCmd)
 }
