@@ -69,7 +69,5 @@ var shortenCmd = &cobra.Command{
 func init() {
 	shortenCmd.PersistentFlags().StringVarP(&urls, "url", "u", "", "短縮API")
 	shortenCmd.PersistentFlags().StringVarP(&service, "service", "s", "", "短縮API")
-
-	//shortenCmd.PersistentFlags().StringArrayVarP(&urls, "url", "u", make([]string, 0), "短縮API")
 	rootCmd.AddCommand(shortenCmd)
 }

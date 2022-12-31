@@ -28,8 +28,10 @@ type TinyURLRespFail struct {
 
 const TINYURL_API_ENV = "TINYURL_API_KEY"
 
+var _ IFetchShUrl = TinyURL{}
+
 // 環境変数からAPIキーをセット
-func (t *TinyURL) Init() (err error) {
+func (t TinyURL) Init() (err error) {
 	apiKey := os.Getenv(TINYURL_API_ENV)
 	if apiKey == "" {
 		return errors.New("APIキーがセットされていません。")
@@ -39,7 +41,7 @@ func (t *TinyURL) Init() (err error) {
 }
 
 // Requstの認証方法はそれぞれ異なる可能性があるため、生成メソッドは別にする
-func (t *TinyURL) CreateReq(baseUrl string) (req *http.Request, err error) {
+func (t TinyURL) CreateReq(baseUrl string) (req *http.Request, err error) {
 	body_json, _ := json.Marshal(TinyURLReq{URL: baseUrl})
 	API_KEY := t.apiKey
 	serviceUrl := "https://api.tinyurl.com/create"
@@ -54,7 +56,7 @@ func (t *TinyURL) CreateReq(baseUrl string) (req *http.Request, err error) {
 
 	return req, nil
 }
-func (t *TinyURL) ParseResp(resp *http.Response) (shUrl string, err error) {
+func (t TinyURL) ParseResp(resp *http.Response) (shUrl string, err error) {
 	bodyText, _ := ioutil.ReadAll(resp.Body)
 	if resp.StatusCode == http.StatusOK {
 		var resp = TinyURLResp{}

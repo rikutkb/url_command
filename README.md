@@ -4,9 +4,6 @@
 
 url [-s][--short] url
 
-### qrコードとしてurlを保存
-url [-q]|[-qr] url　[-o] url.png
-
 ### csvなどのファイルから読み込み(標準出力)
 url [-f] file
 

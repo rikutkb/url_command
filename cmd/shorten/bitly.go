@@ -36,11 +36,13 @@ type Bitly struct {
 
 const BITLY_API_ENV = "BIT_API_KEY"
 
+var _ IFetchShUrl = Bitly{}
+
 func (b Bitly) GetApiKey() string {
 	return b.apiKey
 }
 
-func (b *Bitly) Init() (err error) {
+func (b Bitly) Init() (err error) {
 	apiKey := os.Getenv(BITLY_API_ENV)
 	if apiKey == "" {
 		return errors.New("APIキーがセットされていません。")
@@ -49,7 +51,7 @@ func (b *Bitly) Init() (err error) {
 	return nil
 }
 
-func (b *Bitly) CreateReq(baseUrl string) (req *http.Request, err error) {
+func (b Bitly) CreateReq(baseUrl string) (req *http.Request, err error) {
 	body_json, _ := json.Marshal(BitlyReq{Domain: "bit.ly", URL: baseUrl})
 	BITLY_API_KEY := b.apiKey
 	serviceUrl := "https://api-ssl.bitly.com/v4/shorten"
@@ -64,7 +66,7 @@ func (b *Bitly) CreateReq(baseUrl string) (req *http.Request, err error) {
 
 	return req, nil
 }
-func (b *Bitly) ParseResp(resp *http.Response) (shUrl string, err error) {
+func (b Bitly) ParseResp(resp *http.Response) (shUrl string, err error) {
 
 	bodyText, _ := ioutil.ReadAll(resp.Body)
 	if resp.StatusCode == http.StatusOK {
