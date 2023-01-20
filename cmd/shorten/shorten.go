@@ -5,7 +5,22 @@ import (
 	"fmt"
 	"net/http"
 	"time"
+
+	"github.com/rikutkb/url_command.git/cmd/abstract"
 )
+
+var _ abstract.IFetchCommand = &ShortFetchComand{}
+
+type ShortFetchComand struct {
+	urlPairs map[string]string
+}
+
+func (sfc *ShortFetchComand) GetData(ctx context.Context, url string) error {
+	return nil
+}
+func (sfc ShortFetchComand) WriteData() error {
+	return nil
+}
 
 func CreateShortUrl(ctx context.Context, url string, fetcher IFetchShUrl) (shortUrl string, err error) {
 	// 10秒でタイムアウトを行う。

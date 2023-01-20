@@ -6,10 +6,26 @@ import (
 	"io/ioutil"
 	"net/http"
 	"regexp"
+
+	"github.com/rikutkb/url_command.git/cmd/abstract"
 )
 
 func init() {
 
+}
+
+var _ abstract.IFetchCommand = &UndoFetchCommand{}
+
+type UndoFetchCommand struct {
+	urlPairs map[string]string
+}
+
+func (ufc *UndoFetchCommand) GetData(ctx context.Context, url string) error {
+	return nil
+}
+
+func (ufc UndoFetchCommand) WriteData() error {
+	return nil
 }
 
 func GetRedirect(ctx context.Context, url string) (longUrl string, err error) {
