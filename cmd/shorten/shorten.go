@@ -13,9 +13,18 @@ var _ abstract.IFetchCommand = &ShortFetchComand{}
 
 type ShortFetchComand struct {
 	urlPairs map[string]string
+	Fecther  IFetchShUrl
 }
 
+func NewShortFetchCommand(fetcher IFetchShUrl) *ShortFetchComand {
+	return &ShortFetchComand{Fecther: fetcher}
+}
 func (sfc *ShortFetchComand) GetData(ctx context.Context, url string) error {
+	shortenUrl, err := CreateShortUrl(ctx, url, sfc.Fecther)
+	if err != nil {
+		return err
+	}
+	sfc.urlPairs[url] = shortenUrl
 	return nil
 }
 func (sfc ShortFetchComand) WriteData() error {

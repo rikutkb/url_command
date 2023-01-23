@@ -11,11 +11,12 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/rikutkb/url_command.git/cmd/abstract"
 	"github.com/rikutkb/url_command.git/cmd/shorten"
 	"github.com/spf13/cobra"
 )
 
-func shortenUrls(ctx context.Context, reqUrls []string, fetcher shorten.IFetchShUrl) error {
+func resolveUrls(ctx context.Context, reqUrls []string, cmd abstract.IFetchCommand) error {
 	var wg sync.WaitGroup
 	sem := make(chan bool, 3)
 	defer close(sem)
@@ -31,13 +32,16 @@ func shortenUrls(ctx context.Context, reqUrls []string, fetcher shorten.IFetchSh
 		sem <- true
 		go func(_url string) {
 			defer wg.Done()
-			shortUrl, err := shorten.CreateShortUrl(ctx, _url, fetcher)
+			err := cmd.GetData(ctx, _url)
 			if err != nil {
 				SetCancelSignal(err.Error())
 				fmt.Fprintln(os.Stderr, err)
 				return
 			}
-			fmt.Fprintln(os.Stdout, "baseUrl:"+_url+", resultUrl:"+shortUrl)
+			if err := cmd.WriteData(); err != nil {
+				fmt.Fprintln(os.Stderr, err)
+				return
+			}
 			<-sem
 
 		}(url)
@@ -57,7 +61,8 @@ var shortenCmd = &cobra.Command{
 			os.Exit(2)
 		}
 		splitedUrls := strings.Split(urls, ",")
-		err := shortenUrls(ctx, splitedUrls, fetcher)
+		sfc := shorten.NewShortFetchCommand(fetcher)
+		err := resolveUrls(ctx, splitedUrls, sfc)
 		if err != nil {
 
 			fmt.Fprintln(os.Stderr, err)
