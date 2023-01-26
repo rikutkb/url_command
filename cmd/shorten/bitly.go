@@ -80,6 +80,6 @@ func (b Bitly) ParseResp(resp *http.Response) (shUrl string, err error) {
 		if err := json.Unmarshal(bodyText, &resp); err != nil {
 			return "", fmt.Errorf("failed to marshal json : %s", err)
 		}
-		return "", errors.New(resp.Errors[0].Message)
+		return "", fmt.Errorf("%v", resp.Errors)
 	}
 }

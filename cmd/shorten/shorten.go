@@ -17,7 +17,7 @@ type ShortFetchComand struct {
 }
 
 func NewShortFetchCommand(fetcher IFetchShUrl) *ShortFetchComand {
-	return &ShortFetchComand{Fecther: fetcher}
+	return &ShortFetchComand{Fecther: fetcher, urlPairs: map[string]string{}}
 }
 func (sfc *ShortFetchComand) GetData(ctx context.Context, url string) error {
 	shortenUrl, err := CreateShortUrl(ctx, url, sfc.Fecther)

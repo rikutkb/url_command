@@ -15,7 +15,7 @@ var undoCmd = &cobra.Command{
 	Long:  "",
 	Run: func(cmd *cobra.Command, args []string) {
 		splitedUrls := strings.Split(urls, ",")
-		sfc := &undo.UndoFetchCommand{}
+		sfc := undo.NewUndoFetchCommand()
 		err := resolveUrls(ctx, splitedUrls, sfc)
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)

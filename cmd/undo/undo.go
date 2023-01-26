@@ -20,6 +20,10 @@ type UndoFetchCommand struct {
 	urlPairs map[string]string
 }
 
+func NewUndoFetchCommand() *UndoFetchCommand {
+	return &UndoFetchCommand{urlPairs: map[string]string{}}
+}
+
 func (ufc *UndoFetchCommand) GetData(ctx context.Context, url string) error {
 	client := &http.Client{}
 	// goの標準のリダイレクト機能をオーバライド
