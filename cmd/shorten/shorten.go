@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/rikutkb/url_command.git/cmd/abstract"
@@ -27,7 +28,15 @@ func (sfc *ShortFetchComand) GetData(ctx context.Context, url string) error {
 	sfc.urlPairs[url] = shortenUrl
 	return nil
 }
-func (sfc ShortFetchComand) WriteData() error {
+func (sfc ShortFetchComand) WriteData(reqUrls []string) error {
+	for i, url := range reqUrls {
+		fmt.Fprintf(os.Stdout, sfc.urlPairs[url])
+		if i+1 != len(reqUrls) {
+			fmt.Fprintf(os.Stdout, ",")
+		} else {
+			fmt.Fprintln(os.Stdout, "")
+		}
+	}
 	return nil
 }
 

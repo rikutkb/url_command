@@ -38,15 +38,15 @@ func resolveUrls(ctx context.Context, reqUrls []string, cmd abstract.IFetchComma
 				fmt.Fprintln(os.Stderr, err)
 				return
 			}
-			if err := cmd.WriteData(); err != nil {
-				fmt.Fprintln(os.Stderr, err)
-				return
-			}
 			<-sem
 
 		}(url)
 	}
 	wg.Wait()
+	if err := cmd.WriteData(reqUrls); err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		return err
+	}
 	return nil
 }
 

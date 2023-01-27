@@ -14,6 +14,8 @@ func init() {
 
 }
 
+var reg = regexp.MustCompile(`(<meta property="og:url" content=")(.*)(".*/>)`)
+
 var _ abstract.IFetchCommand = &UndoFetchCommand{}
 
 type UndoFetchCommand struct {
@@ -48,7 +50,6 @@ func (ufc *UndoFetchCommand) GetData(ctx context.Context, url string) error {
 	if err != nil {
 		return err
 	}
-	reg := regexp.MustCompile(`(<meta property="og:url" content=")(.*)(".*/>)`)
 	parsed := reg.FindStringSubmatch(string(body))
 	if len(parsed) < 3 {
 		return fmt.Errorf("レスポンスのパースに失敗しました。")
@@ -58,6 +59,6 @@ func (ufc *UndoFetchCommand) GetData(ctx context.Context, url string) error {
 	//	<meta property="og:url" content="https://xxxxxxxxx" />
 }
 
-func (ufc UndoFetchCommand) WriteData() error {
+func (ufc UndoFetchCommand) WriteData(reqUrls []string) error {
 	return nil
 }
