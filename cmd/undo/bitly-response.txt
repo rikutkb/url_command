@@ -1,0 +1,5 @@
+	<meta property="og:title" content="Cobra.Dev" />
+	<meta property="og:type" content="website" />
+	<meta property="og:description" content="Website Description" />
+	<meta property="og:url" content="https://cobra.dev/" />
+	<meta property="og:site_name" content="Cobra.Dev" /

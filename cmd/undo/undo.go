@@ -48,17 +48,14 @@ func (ufc *UndoFetchCommand) GetData(ctx context.Context, url string) error {
 	if err != nil {
 		return err
 	}
-	reg := regexp.MustCompile(`(<a href=")(.*)(">.*)(</a>)`)
+	reg := regexp.MustCompile(`(<meta property="og:url" content=")(.*)(".*/>)`)
 	parsed := reg.FindStringSubmatch(string(body))
-	if len(parsed) < 4 {
+	if len(parsed) < 3 {
 		return fmt.Errorf("レスポンスのパースに失敗しました。")
 	}
 	ufc.urlPairs[url] = parsed[2]
 	return nil
-	// <a href="https://xxxxxxxxxxxxxxxxxxx">https://xxxxxxxxxxxxxxxxxxx</a>
-	// <a href="https://xxxxxxxxxxxxxxxxxxx">
-	// https://xxxxxxxxxxxxxxxxxxx
-	// </a>
+	//	<meta property="og:url" content="https://xxxxxxxxx" />
 }
 
 func (ufc UndoFetchCommand) WriteData() error {
