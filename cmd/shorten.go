@@ -34,7 +34,6 @@ func resolveUrls(ctx context.Context, reqUrls []string, cmd abstract.IFetchComma
 			err := cmd.GetData(ctx, _url)
 			if err != nil {
 				SetCancelSignal(err.Error())
-				fmt.Fprintln(os.Stderr, err)
 				return
 			}
 			<-sem

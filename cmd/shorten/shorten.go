@@ -42,8 +42,10 @@ func (sfc ShortFetchComand) WriteData(reqUrls []string) error {
 
 func CreateShortUrl(ctx context.Context, url string, fetcher IFetchShUrl) (shortUrl string, err error) {
 	// 10秒でタイムアウトを行う。
-	ctx, cancel := context.WithTimeout(ctx, 10*time.Second)
+	con, cancel := context.WithTimeout(ctx, 30*time.Second)
 	defer cancel()
+	done := make(chan error, 1)
+	urlChan := make(chan string, 1)
 	request, err := fetcher.CreateReq(url)
 	request.Header.Set("accept", "application/json")
 	request.Header.Set("Content-Type", "application/json")
@@ -51,14 +53,22 @@ func CreateShortUrl(ctx context.Context, url string, fetcher IFetchShUrl) (short
 		return "", fmt.Errorf("リクエストの作成に失敗しました。:%s", err)
 	}
 	client := new(http.Client)
-	resp, err := client.Do(request.WithContext(ctx))
-	if err != nil {
-		// レスポンスヘッダー取得に10秒以上かかった場合
-		return "", fmt.Errorf("ヘッダーの取得に失敗しました。:%s", err)
+	go func() {
+		resp, err := client.Do(request.WithContext(con))
+		if err != nil {
+			// レスポンスヘッダー取得に10秒以上かかった場合
+			done <- fmt.Errorf("ヘッダーの取得に失敗しました。:%s", err)
+			return
+		}
+		url, err := fetcher.ParseResp(resp)
+		urlChan <- url
+		done <- err
+		defer resp.Body.Close()
+	}()
+	if err := <-done; err != nil {
+		return "", err
 	}
-	defer resp.Body.Close()
-	return fetcher.ParseResp(resp)
-
+	return <-urlChan, nil
 }
 
 type IFetchShUrl interface {

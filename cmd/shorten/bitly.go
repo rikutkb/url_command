@@ -69,17 +69,17 @@ func (b Bitly) CreateReq(baseUrl string) (req *http.Request, err error) {
 func (b Bitly) ParseResp(resp *http.Response) (shUrl string, err error) {
 
 	bodyText, _ := ioutil.ReadAll(resp.Body)
-	if resp.StatusCode == http.StatusOK {
-		resp := BitlyResp{}
-		if err := json.Unmarshal(bodyText, &resp); err != nil {
+	if resp.StatusCode == http.StatusOK || resp.StatusCode == http.StatusCreated {
+		result := BitlyResp{}
+		if err := json.Unmarshal(bodyText, &result); err != nil {
 			return "", fmt.Errorf("failed to unmarshal json : %s", err)
 		}
-		return resp.ShortURL, nil
+		return result.ShortURL, nil
 	} else {
-		resp := BitlyRespFail{}
-		if err := json.Unmarshal(bodyText, &resp); err != nil {
+		result := BitlyRespFail{}
+		if err := json.Unmarshal(bodyText, &result); err != nil {
 			return "", fmt.Errorf("failed to marshal json : %s", err)
 		}
-		return "", fmt.Errorf("%v", resp.Errors)
+		return "", fmt.Errorf("通信中に不具合がありました。statusCode %d,:%s", resp.StatusCode, result.Errors)
 	}
 }

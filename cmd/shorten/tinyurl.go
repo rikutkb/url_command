@@ -58,19 +58,20 @@ func (t TinyURL) CreateReq(baseUrl string) (req *http.Request, err error) {
 }
 func (t TinyURL) ParseResp(resp *http.Response) (shUrl string, err error) {
 	bodyText, _ := ioutil.ReadAll(resp.Body)
+
 	if resp.StatusCode == http.StatusOK {
-		var resp = TinyURLResp{}
-		if err := json.Unmarshal(bodyText, &resp); err != nil {
+		var result = TinyURLResp{}
+		if err := json.Unmarshal(bodyText, &result); err != nil {
 			return "", fmt.Errorf("failed to unmarshal json :%s", err)
 		}
-		return resp.TinyURLRespData.Url, nil
+		return result.TinyURLRespData.Url, nil
 	} else {
-		var resp = TinyURLRespFail{}
-		if err := json.Unmarshal(bodyText, &resp); err != nil {
+		var result = TinyURLRespFail{}
+		if err := json.Unmarshal(bodyText, &result); err != nil {
 			return "", fmt.Errorf("failed to unmarshal json :%s", err)
 		}
 
-		return "", fmt.Errorf("通信中に不具合がありました。:%s", resp.Errors)
+		return "", fmt.Errorf("通信中に不具合がありました。statusCode %d,:%s", resp.StatusCode, result.Errors)
 	}
 
 }
