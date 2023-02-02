@@ -28,10 +28,10 @@ type TinyURLRespFail struct {
 
 const TINYURL_API_ENV = "TINYURL_API_KEY"
 
-var _ IFetchShUrl = TinyURL{}
+var _ IFetchShUrl = &TinyURL{}
 
 // 環境変数からAPIキーをセット
-func (t TinyURL) Init() (err error) {
+func (t *TinyURL) Init() (err error) {
 	apiKey := os.Getenv(TINYURL_API_ENV)
 	if apiKey == "" {
 		return errors.New("APIキーがセットされていません。")
