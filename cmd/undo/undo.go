@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"os"
 	"regexp"
 
 	"github.com/rikutkb/url_command.git/cmd/abstract"
@@ -14,7 +15,7 @@ func init() {
 
 }
 
-var reg = regexp.MustCompile(`(<meta property="og:url" content=")(.*)(".*/>)`)
+var reg = regexp.MustCompile(`(<a href=")(.*)(">.*)(</a>)`)
 
 var _ abstract.IFetchCommand = &UndoFetchCommand{}
 
@@ -51,14 +52,21 @@ func (ufc *UndoFetchCommand) GetData(ctx context.Context, url string) error {
 		return err
 	}
 	parsed := reg.FindStringSubmatch(string(body))
-	if len(parsed) < 3 {
+	if len(parsed) < 4 {
 		return fmt.Errorf("レスポンスのパースに失敗しました。")
 	}
 	ufc.urlPairs[url] = parsed[2]
 	return nil
-	//	<meta property="og:url" content="https://xxxxxxxxx" />
 }
 
 func (ufc UndoFetchCommand) WriteData(reqUrls []string) error {
+	for i, url := range reqUrls {
+		fmt.Fprintf(os.Stdout, ufc.urlPairs[url])
+		if i+1 != len(reqUrls) {
+			fmt.Fprintf(os.Stdout, ",")
+		} else {
+			fmt.Fprintln(os.Stdout, "")
+		}
+	}
 	return nil
 }

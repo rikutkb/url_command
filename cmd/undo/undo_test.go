@@ -11,7 +11,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestUndoFetchCommand_GetData(t *testing.T) {
+func TestUndoFetchCommandGetData(t *testing.T) {
 
 	type args struct {
 		ctx context.Context
@@ -43,7 +43,7 @@ func TestUndoFetchCommand_GetData(t *testing.T) {
 				url: "bit.ly/3Hthhhn",
 			},
 			fileName:    `/bitly-response.txt`,
-			expectedUrl: "https://cobra.dev/",
+			expectedUrl: "https://github.com/rikutkb/url_command",
 			status:      http.StatusMovedPermanently,
 			wantErr:     false,
 		},

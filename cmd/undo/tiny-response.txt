@@ -1,10 +1,11 @@
-	<meta property="og:image:alt"
-		content="Contribute to rikutkb/url_command development by creating an account on GitHub." />
-	<meta property="og:image:width" content="1200" />
-	<meta property="og:image:height" content="600" />
-	<meta property="og:site_name" content="GitHub" />
-	<meta property="og:type" content="object" />
-	<meta property="og:title" content="GitHub - rikutkb/url_command" />
-	<meta property="og:url" content="https://github.com/rikutkb/url_command" />
-	<meta property="og:description"
-		content="Contribute to rikutkb/url_command development by creating an account on GitHub." />
+<html>
+    <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="refresh" content="0;url='https://github.com/rikutkb/url_command'" />
+
+        <title>Redirecting to https://github.com/rikutkb/url_command</title>
+    </head>
+    <body>
+        Redirecting to <a href="https://github.com/rikutkb/url_command">https://github.com/rikutkb/url_command</a>.
+    </body>
+</html>
