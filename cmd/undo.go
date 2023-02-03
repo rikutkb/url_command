@@ -5,7 +5,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/rikutkb/url_command.git/cmd/undo"
+	"github.com/rikutkb/url_command/cmd/undo"
 	"github.com/spf13/cobra"
 )
 

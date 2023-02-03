@@ -8,7 +8,7 @@ import (
 	"os"
 	"regexp"
 
-	"github.com/rikutkb/url_command.git/cmd/abstract"
+	"github.com/rikutkb/url_command/cmd/abstract"
 )
 
 func init() {

@@ -7,7 +7,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/rikutkb/url_command.git/cmd/abstract"
+	"github.com/rikutkb/url_command/cmd/abstract"
 )
 
 var _ abstract.IFetchCommand = &ShortFetchComand{}

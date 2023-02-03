@@ -10,8 +10,8 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/rikutkb/url_command.git/cmd/abstract"
-	"github.com/rikutkb/url_command.git/cmd/shorten"
+	"github.com/rikutkb/url_command/cmd/abstract"
+	"github.com/rikutkb/url_command/cmd/shorten"
 	"github.com/spf13/cobra"
 )
 

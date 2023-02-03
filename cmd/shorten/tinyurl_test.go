@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/rikutkb/url_command.git/cmd/shorten"
+	"github.com/rikutkb/url_command/cmd/shorten"
 )
 
 func TestTinyURLCreateRequest(t *testing.T) {

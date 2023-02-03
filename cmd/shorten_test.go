@@ -10,7 +10,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/rikutkb/url_command.git/cmd/abstract"
+	"github.com/rikutkb/url_command/cmd/abstract"
 )
 
 var _ abstract.IFetchCommand = &TestFetchComand{}
