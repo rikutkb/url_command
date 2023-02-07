@@ -65,11 +65,10 @@ func cancelBySignal(cancel context.CancelFunc) {
 	switch s := sig.(type) {
 	case syscall.Signal:
 		log.Printf("[info] canceled by got signal %d", s)
-	case CancelSig:
-		// Stringが評価される。
-		log.Printf("[info] canceled by %s", s)
+	default:
+		fmt.Println("default")
 	}
-	fmt.Fprintln(os.Stdout, "cancel by signal")
+	fmt.Fprintln(os.Stderr, "cancel by signal")
 	cancel()
 	os.Exit(2)
 }
@@ -110,6 +109,9 @@ func init() {
 	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 	sigCh = make(chan os.Signal, 1)
 	signal.Notify(sigCh, syscall.SIGHUP)
+	signal.Notify(sigCh, syscall.SIGINT)
+	signal.Notify(sigCh, syscall.SIGTERM)
+	signal.Notify(sigCh, syscall.SIGQUIT)
 	ctx, cancel = context.WithCancel(context.Background())
 	go func() {
 		cancelBySignal(cancel)

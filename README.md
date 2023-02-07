@@ -26,10 +26,11 @@ export BIT_API_KEY=xxxxxxxxxxxxxxxxxxxxxxx
 tinyURLの使用時
 
 $ export TINYURL_API_KEY=xxxxxxxxxxxxxxxxxxxxxxx 
-$ ./main shorten -s bitly -u https://github.com/rikutkb/url_command                  
+$ ~ % url_command shorten -s bitly -u https://github.com/rikutkb/url_command,https://www.youtube.com/feed/subscriptions
+https://bit.ly/3R88Drn,https://bit.ly/3RsoaTh                 
 APIキーがセットされていません。
-$ ./main shorten -s TinyURL -u https://github.com/rikutkb/url_command                
-baseUrl:https://github.com/rikutkb/url_command, resultUrl:https://tinyurl.com/2kvjk6jm
+$ ~ % url_command shorten -s TinyURL -u https://github.com/rikutkb/url_command,https://www.youtube.com/feed/subscriptions
+https://tinyurl.com/2kvjk6jm,https://tinyurl.com/bdvnndt9
 
-$ ./main undo -u https://tinyurl.com/2kvjk6jm
-baseUrl:https://tinyurl.com/2kvjk6jm,resultUrl: https://github.com/rikutkb/url_command
+$~ % url_command undo -u https://tinyurl.com/2kvjk6jm,https://tinyurl.com/bdvnndt9
+https://github.com/rikutkb/url_command,https://www.youtube.com/feed/subscriptions

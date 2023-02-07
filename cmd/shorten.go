@@ -19,28 +19,32 @@ func resolveUrls(ctx context.Context, reqUrls []string, cmd abstract.IFetchComma
 	var wg sync.WaitGroup
 	sem := make(chan bool, 3)
 	defer close(sem)
-
+	_ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
 	for _, url := range reqUrls {
+		done := make(chan error, 1)
 		select {
 		case <-ctx.Done():
 			return nil
 		default:
 		}
 		wg.Add(1)
-
 		sem <- true
 		go func(_url string) {
 			defer wg.Done()
-			err := cmd.GetData(ctx, _url)
+			err := cmd.GetData(_ctx, _url)
+			done <- err
 			if err != nil {
-				SetCancelSignal(err.Error())
 				return
 			}
 			<-sem
-
 		}(url)
+		if err := <-done; err != nil {
+			return err
+		}
 	}
 	wg.Wait()
+
 	if err := cmd.WriteData(reqUrls); err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		return err
@@ -53,6 +57,12 @@ var shortenCmd = &cobra.Command{
 	Short: "APIを使用しurlの短縮化を行います。",
 	Long:  "",
 	Run: func(cmd *cobra.Command, args []string) {
+		switch service {
+		case "TinyURL", "bitly":
+		default:
+			fmt.Fprintln(os.Stderr, "指定されたサービスは使用できません。使用できるサービスはbitly or TinyURLです。")
+			os.Exit(2)
+		}
 		var fetcher = shorten.NewFecher(service)
 		if err := fetcher.Init(); err != nil {
 			fmt.Fprintln(os.Stderr, err)
@@ -62,7 +72,6 @@ var shortenCmd = &cobra.Command{
 		sfc := shorten.NewShortFetchCommand(fetcher)
 		err := resolveUrls(ctx, splitedUrls, sfc)
 		if err != nil {
-
 			fmt.Fprintln(os.Stderr, err)
 			os.Exit(2)
 		}
