@@ -19,29 +19,30 @@ func resolveUrls(ctx context.Context, reqUrls []string, cmd abstract.IFetchComma
 	var wg sync.WaitGroup
 	sem := make(chan bool, 3)
 	defer close(sem)
+	done := make(chan error, 1)
+	defer close(done)
 	_ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 	for _, url := range reqUrls {
-		done := make(chan error, 1)
+
+		wg.Add(1)
+		sem <- true
 		select {
 		case <-ctx.Done():
 			return nil
+		case err := <-done:
+			return err
 		default:
 		}
-		wg.Add(1)
-		sem <- true
 		go func(_url string) {
 			defer wg.Done()
 			err := cmd.GetData(_ctx, _url)
-			done <- err
+			<-sem
 			if err != nil {
+				done <- err
 				return
 			}
-			<-sem
 		}(url)
-		if err := <-done; err != nil {
-			return err
-		}
 	}
 	wg.Wait()
 
